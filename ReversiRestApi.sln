@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.808.7
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReversiRestApi", "ReversiRestApi\ReversiRestApi.csproj", "{EA4FDFB2-815F-4582-BC3C-BECFBA495975}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTestProjectReversiSpel", "SpelTest\NUnitTestProjectReversiSpel.csproj", "{FA2639B1-A978-422B-A50B-7A016D57AE9A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EA4FDFB2-815F-4582-BC3C-BECFBA495975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA4FDFB2-815F-4582-BC3C-BECFBA495975}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA4FDFB2-815F-4582-BC3C-BECFBA495975}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA4FDFB2-815F-4582-BC3C-BECFBA495975}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA2639B1-A978-422B-A50B-7A016D57AE9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA2639B1-A978-422B-A50B-7A016D57AE9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA2639B1-A978-422B-A50B-7A016D57AE9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA2639B1-A978-422B-A50B-7A016D57AE9A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1F1466F9-A156-46AE-8054-108FA7A1B8BA}
+	EndGlobalSection
+EndGlobal
