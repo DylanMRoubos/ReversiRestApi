@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 namespace ReversiRestApi.Model
 {
     public class Spel : ISpel
@@ -6,17 +8,56 @@ namespace ReversiRestApi.Model
         public Spel()
         {
             Bord = new Kleur[8, 8];
+            AandeBeurt = Kleur.Zwart;
             ResetBoard();
             PrintBoard();
         }
 
+        private Dictionary<string, Kleur> PlayerMapping = new Dictionary<string, Kleur>();
         public int ID { get; set; }
         public string Omschrijving { get; set; }
         public string Token { get; set; }
-        public string Speler1Token { get; set; }
-        public string Speler2Token { get; set; }
+        private string _speler1Token;
+        public string Speler1Token
+        {
+            get => _speler1Token;
+            set
+            {
+                _speler1Token = value;
+                PlayerMapping.TryAdd(Speler1Token, Kleur.Zwart);
+            }
+        }
+        private string _speler2Token;
+        public string Speler2Token
+        {
+            get => _speler2Token;
+            set
+            {
+                _speler2Token = value;
+                PlayerMapping.TryAdd(Speler2Token, Kleur.Wit);
+            }            
+        }
         public Kleur[,] Bord { get; set; }
         public Kleur AandeBeurt { get; set; }
+        public bool Finished { get; set; }
+        public string Winner { get; set; }
+        
+        public Kleur GetPlayerColour(string playerToken)
+        {
+            try
+            {
+                Kleur playerColour;
+
+                PlayerMapping.TryGetValue(playerToken, out playerColour);
+
+                return playerColour;
+            }
+            catch (Exception _)
+            {
+                return Kleur.Geen;
+            }
+            
+        }
 
         public bool Afgelopen()
         {
@@ -46,6 +87,29 @@ namespace ReversiRestApi.Model
             }
 
             return false;
+        }
+
+        //Method to surrender game
+        public bool Surrender(string playerID)
+        {
+            if(playerID.Equals(Speler1Token))
+            {
+                Winner = Speler2Token;
+                Finished = true;
+                return true;
+
+            }
+            else if (playerID.Equals(Speler2Token))
+            {
+                Winner = Speler1Token;
+                Finished = true;
+                return true;
+            }
+            else
+            {
+                //Coulndt find player to surrender
+                return false;
+            }
         }
 
         //Check which colour has more pieces

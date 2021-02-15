@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ReversiRestApi.Model;
 
 namespace ReversiRestApi
 {
@@ -26,6 +27,7 @@ namespace ReversiRestApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSingleton< ISpelRepository, SpelRepository >();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
