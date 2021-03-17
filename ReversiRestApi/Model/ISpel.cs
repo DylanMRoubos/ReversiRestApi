@@ -4,10 +4,10 @@ namespace ReversiRestApi
     public interface ISpel
     {
         int ID { get; set; }
-        string Omschrijving { get; set; }
+        string Description { get; set; }
         //het unieke token van het spel
         string Token { get; set; }
-        string Speler1Token { get; set; }
+        string PlayerToken1 { get; set; }
         string Speler2Token { get; set; }
 
         Kleur[,] Bord { get; set; }

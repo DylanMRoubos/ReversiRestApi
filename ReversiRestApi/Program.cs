@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ReversiRestApi.DAL;
 using ReversiRestApi.Model;
 
 namespace ReversiRestApi
@@ -14,6 +15,10 @@ namespace ReversiRestApi
     {
         public static void Main(string[] args)
         {
+            Spel spel = new Spel();
+
+            SpelTbvJson joe = new SpelTbvJson(spel);
+
             CreateHostBuilder(args).Build().Run();
         }
 

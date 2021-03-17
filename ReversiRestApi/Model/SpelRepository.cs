@@ -15,16 +15,16 @@ namespace ReversiRestApi.Model
             Spel spel3 = new Spel();
 
             spel1.Token = "joejoe";
-            spel1.Speler1Token = "abcdef";
+            spel1.PlayerToken1 = "abcdef";
             spel1.Speler2Token = "abcdefg";
-            spel1.Omschrijving = "Potje snel reveri, dus niet lang nadenken";
+            spel1.Description = "Potje snel reveri, dus niet lang nadenken";
             spel2.Token = "joe";
-            spel2.Speler1Token = "ghijkl";
+            spel2.PlayerToken1 = "ghijkl";
             spel2.Speler2Token = "mnopqr";
-            spel2.Omschrijving = "Ik zoek een gevorderde tegenspeler!";
+            spel2.Description = "Ik zoek een gevorderde tegenspeler!";
             spel3.Token = "jo";
-            spel3.Speler1Token = "stuvwx";
-            spel3.Omschrijving = "Na dit spel wil ik er nog een paar spelen tegen zelfde tegenstander";
+            spel3.PlayerToken1 = "stuvwx";
+            spel3.Description = "Na dit spel wil ik er nog een paar spelen tegen zelfde tegenstander";
 
             Spellen = new List<Spel> { spel1, spel2, spel3 };
         }
@@ -41,9 +41,13 @@ namespace ReversiRestApi.Model
 
         public Spel GetSpel(string spelToken)
         {
-            return (Spel)(from value in Spellen where spelToken == value.Speler1Token select value);
+            return (Spel)(from value in Spellen where spelToken == value.PlayerToken1 select value);
         }
 
+        public void RemoveGame(string spelToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

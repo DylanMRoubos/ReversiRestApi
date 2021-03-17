@@ -15,16 +15,20 @@ namespace ReversiRestApi.Model
 
         private Dictionary<string, Kleur> PlayerMapping = new Dictionary<string, Kleur>();
         public int ID { get; set; }
-        public string Omschrijving { get; set; }
+        public string Description { get; set; }
         public string Token { get; set; }
         private string _speler1Token;
-        public string Speler1Token
+        public string PlayerToken1
         {
             get => _speler1Token;
             set
             {
                 _speler1Token = value;
-                PlayerMapping.TryAdd(Speler1Token, Kleur.Zwart);
+                if (Speler2Token != null)
+                {
+                    PlayerMapping.TryAdd(PlayerToken1, Kleur.Zwart);
+
+                }
             }
         }
         private string _speler2Token;
@@ -34,7 +38,11 @@ namespace ReversiRestApi.Model
             set
             {
                 _speler2Token = value;
-                PlayerMapping.TryAdd(Speler2Token, Kleur.Wit);
+                if(Speler2Token != null)
+                {
+                    PlayerMapping.TryAdd(Speler2Token, Kleur.Wit);
+                }
+                
             }            
         }
         public Kleur[,] Bord { get; set; }
@@ -92,7 +100,7 @@ namespace ReversiRestApi.Model
         //Method to surrender game
         public bool Surrender(string playerID)
         {
-            if(playerID.Equals(Speler1Token))
+            if(playerID.Equals(PlayerToken1))
             {
                 Winner = Speler2Token;
                 Finished = true;
@@ -101,7 +109,7 @@ namespace ReversiRestApi.Model
             }
             else if (playerID.Equals(Speler2Token))
             {
-                Winner = Speler1Token;
+                Winner = PlayerToken1;
                 Finished = true;
                 return true;
             }

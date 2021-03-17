@@ -8,6 +8,7 @@ namespace ReversiRestApi.Model
         void AddSpel(Spel spel);
         public List<Spel> GetSpellen();
         Spel GetSpel(string spelToken);
+        public void RemoveGame(string spelToken);
         // ... }
     }
 }

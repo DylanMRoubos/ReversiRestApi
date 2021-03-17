@@ -26,35 +26,55 @@ namespace ReversiRestApi.Controllers
                 (from value
                  in iRepository.GetSpellen()
                  where string.IsNullOrWhiteSpace(value.Speler2Token)
-                 select value.Omschrijving)
+                 select new {
+                     value.PlayerToken1,
+                     value.Description,
+                     value.Token
+                 })
                 .ToList());
         }
+        // Put api/Spel/
+        [HttpDelete("{gameToken}")]
+        public ActionResult<bool> Delete(string gameToken)
+        {
+            iRepository.RemoveGame(gameToken);
 
-        // GET api/spel
+            iRepository.GetSpel(gameToken);
+
+            return StatusCode(204, true);
+
+        }
+
+        // GET api/spel{gametoken}
         [HttpGet("{gameToken}")]
         public ActionResult<Spel> GetGame(string gameToken)
         {
-             var spel = (
-                  (from value in iRepository.GetSpellen()
-                  where value.Token.Equals(gameToken)
-                  select value).First());
+            var spel = iRepository.GetSpel(gameToken);
 
             return new ObjectResult(new SpelTbvJson(spel));
         }
 
-        // GET api/SpelSpeler/<spelertoken>
+        // GET api/Speler/<spelertoken>
         [HttpGet("Speler/{playerToken}")]
         public ActionResult<Spel> GetGamePlayer(string playerToken)
         {
             if(!string.IsNullOrWhiteSpace(playerToken))
             {
-                var spel = (
-                (from value in iRepository.GetSpellen()
-                 where value.Speler1Token.Equals(playerToken) ||
-                 value.Speler2Token.Equals(playerToken)
-                 select value).First());
+                try
+                {
+                    var spel = (
+               (from value in iRepository.GetSpellen()
+                where (value.PlayerToken1.Equals(playerToken) ||
+                value.Speler2Token.Equals(playerToken)) && value.Finished != true
+                select value).First());
 
-                return new ObjectResult(new SpelTbvJson(spel));
+                    return new ObjectResult(new SpelTbvJson(spel));
+                }
+                catch (Exception e)
+                {
+                    return null;
+                }
+               
             }
             return null;
            
@@ -106,6 +126,7 @@ namespace ReversiRestApi.Controllers
         [HttpPut("Opgeven")]
         public ActionResult<bool> Surrender([FromBody] Surrender data)
         {
+
             var game = (from value in iRepository.GetSpellen()
                         where value.Token.Equals(data.gameToken)
                         select value).First();
@@ -116,12 +137,12 @@ namespace ReversiRestApi.Controllers
 
         // POST api/CreateGame
         [HttpPost]
-        public ObjectResult CreateGame(string playerToken, string omschrijving)
+        public ObjectResult CreateGame([FromBody] CreateGame data)
         {
             Spel spel = new Spel
             {
-                Speler1Token = playerToken,
-                Omschrijving = omschrijving,
+                PlayerToken1 = data.PlayerToken1,
+                Description = data.Description,
                 Token = Guid.NewGuid().ToString()
             };
 

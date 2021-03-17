@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ReversiRestApi.DAL;
 using ReversiRestApi.Model;
 
 namespace ReversiRestApi
@@ -26,8 +27,17 @@ namespace ReversiRestApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("https://localhost",
+                                            "https://dylanroubos.hbo-ict.org");
+                    });
+            });
             services.AddControllers();
-            services.AddSingleton< ISpelRepository, SpelRepository >();
+            services.AddSingleton< ISpelRepository, SpelAccessLayer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +51,8 @@ namespace ReversiRestApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthorization();
 

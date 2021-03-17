@@ -1,44 +1,48 @@
 ﻿using System;
+using Newtonsoft.Json;
+
 namespace ReversiRestApi.Model
 {
     public class SpelTbvJson
     {
         public int ID { get; set; }
-        public string Omschrijving { get; set; }
+        public string Description { get; set; }
         public string Token { get; set; }
-        public string Speler1Token { get; set; }
-        public string Speler2Token { get; set; }
-        public string[] Bord { get; set; }
-        public Kleur AandeBeurt { get; set; }
+        public string PlayerToken1 { get; set; }
+        public string PlayerToken2 { get; set; }
+        public string Board { get; set; }
+        public Kleur CurrentPlayer { get; set; }
 
 
         public SpelTbvJson(Spel spel)
         {
             ID = spel.ID;
-            Omschrijving = spel.Omschrijving;
+            Description = spel.Description;
             Token = spel.Token;
-            Speler1Token = spel.Speler1Token;
-            Speler2Token = spel.Speler2Token;
-            Bord = CreateSerialisableBoard(spel.Bord);
-            AandeBeurt = spel.AandeBeurt;
+            PlayerToken1 = spel.PlayerToken1;
+            PlayerToken2 = spel.Speler2Token;
+            CurrentPlayer = spel.AandeBeurt;
+            Board = JsonConvert.SerializeObject(spel.Bord);
         }
 
-        public string[] CreateSerialisableBoard(Kleur[,] board)
-        {
-            string[] BoardRows = new string[board.GetLength(0)];
-            string ColumnColour = "";
+        //TODO: Remove this if works 
+        //public string[] CreateSerialisableBoard(Kleur[,] board)
+        //{
+        //    string[] BoardRows = new string[64];
 
-            for (int i = 0; i < board.GetLength(0); i++)
-            {
-                for(int j = 0; j < board.GetLength(1); j++)
-                {
-                    ColumnColour += board[i, j];
-                    if (j < board.GetLength(1) - 1) { ColumnColour += ", "; };
-                }
-                BoardRows[i] = ColumnColour;
-                ColumnColour = "";
-            }
-            return BoardRows;
-        }
+
+        //    string[] row = new string[8];
+
+        //    for (int i = 0; i < board.GetLength(0); i++)
+        //    {
+        //        for(int j = 0; j < board.GetLength(1); j++)
+        //        {
+        //            row[j] = board[i, j].ToString();
+        //        }
+        //        BoardRows[i] = row;
+        //        ColumnColour = "";
+        //    }
+        //    return BoardRows;
+        //}
     }
 }
