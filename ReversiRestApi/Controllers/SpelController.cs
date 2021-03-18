@@ -39,7 +39,7 @@ namespace ReversiRestApi.Controllers
         {
             iRepository.RemoveGame(gameToken);
 
-            iRepository.GetSpel(gameToken);
+            //iRepository.GetSpel(gameToken);
 
             return StatusCode(204, true);
 

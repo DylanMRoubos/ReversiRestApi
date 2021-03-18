@@ -24,25 +24,5 @@ namespace ReversiRestApi.Model
             CurrentPlayer = spel.AandeBeurt;
             Board = JsonConvert.SerializeObject(spel.Bord);
         }
-
-        //TODO: Remove this if works 
-        //public string[] CreateSerialisableBoard(Kleur[,] board)
-        //{
-        //    string[] BoardRows = new string[64];
-
-
-        //    string[] row = new string[8];
-
-        //    for (int i = 0; i < board.GetLength(0); i++)
-        //    {
-        //        for(int j = 0; j < board.GetLength(1); j++)
-        //        {
-        //            row[j] = board[i, j].ToString();
-        //        }
-        //        BoardRows[i] = row;
-        //        ColumnColour = "";
-        //    }
-        //    return BoardRows;
-        //}
     }
 }

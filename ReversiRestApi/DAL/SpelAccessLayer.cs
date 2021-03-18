@@ -31,8 +31,7 @@ namespace ReversiRestApi.DAL
                 sqlCmd.Parameters.AddWithValue("@Token", spel.Token);
                 sqlCmd.Parameters.AddWithValue("@Speler1Token", spel.PlayerToken1);
                 sqlCmd.Parameters.AddWithValue("@Omschrijving", spel.Description);
-                sqlCmd.Parameters.AddWithValue("@AandeBeurt", spel.AandeBeurt);
-
+                sqlCmd.Parameters.AddWithValue("@AandeBeurt", spel.AandeBeurt);               
                 
                 sqlCmd.ExecuteNonQuery();
 
