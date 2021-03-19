@@ -33,7 +33,7 @@ namespace ReversiRestApi.Controllers
                  })
                 .ToList());
         }
-        // Put api/Spel/
+        // Delete api/Spel/
         [HttpDelete("{gameToken}")]
         public ActionResult<bool> Delete(string gameToken)
         {
@@ -54,6 +54,34 @@ namespace ReversiRestApi.Controllers
             return new ObjectResult(new SpelTbvJson(spel));
         }
 
+        // PUT api/spel
+        [HttpPut]
+        public ActionResult<bool> JoinGame([FromBody] JoinGame data)
+        {
+            Console.WriteLine("Yeet");
+            if(data.gameToken == "" || data.playerToken == "")
+            {
+                return BadRequest("Value must be passed in the request body.");
+            }
+
+            var game = iRepository.GetSpellen().FirstOrDefault(g => g.Token == data.gameToken);
+            if(game == null)
+            {
+                return BadRequest("Game does not exist");
+            }
+            else if (game.Speler2Token != "")
+            {
+                return BadRequest("Can't join a game when there are already two players");
+            }
+            else if (game.PlayerToken1 == data.playerToken)
+            {
+                return BadRequest("Can't join a game you're already a particapant of");
+            }
+
+            iRepository.AddPlayer(data.gameToken, data.playerToken); 
+            return StatusCode(204, data.gameToken);
+
+        }
         // GET api/Speler/<spelertoken>
         [HttpGet("Speler/{playerToken}")]
         public ActionResult<Spel> GetGamePlayer(string playerToken)
@@ -114,10 +142,16 @@ namespace ReversiRestApi.Controllers
             //Check if player wants to pass its turn
             if(!data.pass)
             {
-                return game.DoeZet(data.y, data.x);
+                if (game.DoeZet(data.y, data.x))
+                {
+                    //add zet to db
+                    iRepository.AddZet(data.gameToken, (int)game.AandeBeurt, data.x, data.y);
+                    return true;
+                }
+                return false;
             } else
             {
-                return game.Pas();
+                return true;
             }
 
         }

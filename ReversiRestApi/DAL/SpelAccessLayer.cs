@@ -55,6 +55,27 @@ namespace ReversiRestApi.DAL
             }
         }
 
+        public void AddZet(string spelToken, int colour, int x, int y)
+        {
+            //UPDATE Cell
+            //SET kleur = 0
+            //WHERE Token = 'd2dd4b51-c863-4dd7-9daa-060ebc38a569' AND Row = 3 AND Col = 2
+
+            using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
+            {
+
+                sqlCon.Open();
+                var sqlCmd = new SqlCommand("UPDATE Cell SET kleur = @colour WHERE Token = @spelToken AND Row = @x AND Col = @y", sqlCon);
+
+                sqlCmd.Parameters.AddWithValue("@spelToken", spelToken);
+                sqlCmd.Parameters.AddWithValue("@colour", colour);
+                sqlCmd.Parameters.AddWithValue("@x", x);
+                sqlCmd.Parameters.AddWithValue("@y", y);
+
+                sqlCmd.ExecuteNonQuery();
+            }
+        }
+
         public Spel GetSpel(string spelToken)
         {
             var spel = new Spel();
@@ -110,10 +131,19 @@ namespace ReversiRestApi.DAL
 
                     sqlCmd.ExecuteNonQuery();
                 }
-          
+        }
+        public void AddPlayer(string gameToken, string playerToken)
+        {
+            using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
+            {
+                sqlCon.Open();
+                var sqlCmd = new SqlCommand("UPDATE Games SET Speler2Token = @player2Token WHERE Token = @gameToken", sqlCon);
 
-           
+                sqlCmd.Parameters.AddWithValue("@player2Token", playerToken);
+                sqlCmd.Parameters.AddWithValue("@gameToken", gameToken);
 
+                sqlCmd.ExecuteNonQuery();
+            }
         }
     }
 }

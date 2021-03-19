@@ -48,6 +48,15 @@ namespace ReversiRestApi.Model
         {
             throw new NotImplementedException();
         }
+
+        public void AddZet(string gameToken, int aandeBeurt, int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+        public void AddPlayer(string gameToken, string playerToken) {
+            throw new NotImplementedException();
+        }
+
     }
 }
 
