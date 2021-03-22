@@ -9,6 +9,7 @@
     <Folder Include="Model\" />
     <Folder Include="Controllers\" />
     <Folder Include="DAL\" />
+    <Folder Include="Model\RequestBody%27s\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />

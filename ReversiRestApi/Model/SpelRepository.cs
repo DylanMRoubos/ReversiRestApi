@@ -49,7 +49,7 @@ namespace ReversiRestApi.Model
             throw new NotImplementedException();
         }
 
-        public void AddZet(string gameToken, int aandeBeurt, int x, int y)
+        public bool PlacePiece(string gameToken, int aandeBeurt, int x, int y)
         {
             throw new NotImplementedException();
         }
@@ -57,6 +57,15 @@ namespace ReversiRestApi.Model
             throw new NotImplementedException();
         }
 
+        void ISpelRepository.PlacePiece(string gameToken, int aandeBeurt, int x, int y, Spel localGame)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool ISpelRepository.AddPlayer(string gameToken, string speler2Token)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

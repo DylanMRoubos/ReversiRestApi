@@ -78,8 +78,15 @@ namespace ReversiRestApi.Controllers
                 return BadRequest("Can't join a game you're already a particapant of");
             }
 
-            iRepository.AddPlayer(data.gameToken, data.playerToken); 
-            return StatusCode(204, data.gameToken);
+            if(iRepository.AddPlayer(data.gameToken, data.playerToken))
+            {
+                return StatusCode(204, data.gameToken);
+            } else
+            {
+                return StatusCode(500, "500 Internal Server Error");
+            }
+            
+            
 
         }
         // GET api/Speler/<spelertoken>
@@ -140,12 +147,12 @@ namespace ReversiRestApi.Controllers
             }
 
             //Check if player wants to pass its turn
-            if(!data.pass)
+            if (!data.pass)
             {
-                if (game.DoeZet(data.y, data.x))
+                 if (game.PlacePiece(data.y, data.x))
                 {
                     //add zet to db
-                    iRepository.AddZet(data.gameToken, (int)game.AandeBeurt, data.x, data.y);
+                    iRepository.PlacePiece(data.gameToken, (int)game.GetPlayerColour(data.playerToken), data.x, data.y, game);                    
                     return true;
                 }
                 return false;

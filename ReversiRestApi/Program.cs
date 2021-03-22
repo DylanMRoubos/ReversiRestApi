@@ -15,11 +15,31 @@ namespace ReversiRestApi
     {
         public static void Main(string[] args)
         {
+
+
+            // Arrange
             Spel spel = new Spel();
+            //     0 1 2 3 4 5 6 7
+            //           v
+            // 0   0 0 0 0 0 0 0 0  
+            // 1   0 0 0 0 0 0 0 0
+            // 2   0 0 0 2 0 0 0 0  <
+            // 3   0 0 0 1 2 0 0 0
+            // 4   0 0 0 2 1 0 0 0
+            // 5   0 0 0 0 0 0 0 0
+            // 6   0 0 0 0 0 0 0 0
+            // 7   0 0 0 0 0 0 0 0
 
-            SpelTbvJson joe = new SpelTbvJson(spel);
+            // Act
+            spel.AandeBeurt = Kleur.Zwart;
+            var actual = spel.PlacePiece(2, 3);
 
-            CreateHostBuilder(args).Build().Run();
+            spel.PrintBoard();
+            //spel.PlacePiece(2, 4);
+            //Console.WriteLine("-=-=-");
+            //spel.PrintBoard();
+
+            //CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

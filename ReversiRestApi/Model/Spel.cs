@@ -13,7 +13,7 @@ namespace ReversiRestApi.Model
             PrintBoard();
         }
 
-        private Dictionary<string, Kleur> PlayerMapping = new Dictionary<string, Kleur>();
+        public Dictionary<string, Kleur> PlayerMapping = new Dictionary<string, Kleur>();
         public int ID { get; set; }
         public string Description { get; set; }
         public string Token { get; set; }
@@ -26,7 +26,7 @@ namespace ReversiRestApi.Model
                 _speler1Token = value;
                 if (Speler2Token != null)
                 {
-                    PlayerMapping.TryAdd(PlayerToken1, Kleur.Zwart);
+                    PlayerMapping.TryAdd(PlayerToken1, Kleur.Wit);
 
                 }
             }
@@ -40,7 +40,7 @@ namespace ReversiRestApi.Model
                 _speler2Token = value;
                 if(Speler2Token != null)
                 {
-                    PlayerMapping.TryAdd(Speler2Token, Kleur.Wit);
+                    PlayerMapping.TryAdd(Speler2Token, Kleur.Zwart);
                 }
                 
             }            
@@ -87,10 +87,10 @@ namespace ReversiRestApi.Model
             return true;
         }
 
-        public bool DoeZet(int rijZet, int kolomZet)
+        public bool PlacePiece(int rijZet, int kolomZet)
         {
             if(ZetMogelijk(rijZet, kolomZet)) {
-                Bord[rijZet, kolomZet] = AandeBeurt;
+                Bord[kolomZet, rijZet] = AandeBeurt;
                 return Pas();
             }
 
@@ -159,7 +159,7 @@ namespace ReversiRestApi.Model
         }
 
         public bool ZetMogelijk(int rijZet, int kolomZet)
-        {
+        { 
             //return false if piece is placed outside of board
             if (rijZet > 7 || kolomZet > 7 || kolomZet < 0 || rijZet < 0) return false;
 
@@ -233,18 +233,6 @@ namespace ReversiRestApi.Model
             }
         }
 
-        //public void PrintSurrounding(Kleur[,] surroundingPieces)
-        //{
-        //    for (int i = 0; i < surroundingPieces.GetLength(1); i++)
-        //    {
-        //        for (int j = 0; j < surroundingPieces.GetLength(0); j++)
-        //        {
-        //            Console.Write(surroundingPieces[i, j]);
-        //        }
-        //        Console.WriteLine();
-        //    }
-        //}
-
         public void ResetBoard()
         {
             for (int i = 0; i < Bord.GetLength(1); i++)
@@ -268,7 +256,6 @@ namespace ReversiRestApi.Model
             }
         }
 
-        //TODO: add method for diagnals && add comments
         public bool CheckForPieceInDirection(Direction direction, Kleur colour, int row, int col)
         {
             bool result = false;

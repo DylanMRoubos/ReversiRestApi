@@ -55,25 +55,35 @@ namespace ReversiRestApi.DAL
             }
         }
 
-        public void AddZet(string spelToken, int colour, int x, int y)
+        public void PlacePiece(string spelToken, int colour, int x, int y, Spel localGame)
         {
-            //UPDATE Cell
-            //SET kleur = 0
-            //WHERE Token = 'd2dd4b51-c863-4dd7-9daa-060ebc38a569' AND Row = 3 AND Col = 2
 
             using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
             {
 
+                RemoveBord(spelToken);
+
+                Console.WriteLine(localGame.Bord);
                 sqlCon.Open();
-                var sqlCmd = new SqlCommand("UPDATE Cell SET kleur = @colour WHERE Token = @spelToken AND Row = @x AND Col = @y", sqlCon);
+                string addBordQuery = "INSERT INTO Cell (Token, Row, Col, Kleur) VALUES (@Token, @Row, @Col, @Kleur)";
+                //Loops over game bord and adds all cells with x and y locations and the colour that occupies the space and the game token
+                for (int i = 0; i < localGame.Bord.GetLength(0); i++)
+                {
+                    for (int j = 0; j < localGame.Bord.GetLength(1); j++)
+                    {
+                        SqlCommand sqlCmdAddBord = new SqlCommand(addBordQuery, sqlCon);
+                        sqlCmdAddBord.Parameters.AddWithValue("@Token", localGame.Token);
+                        sqlCmdAddBord.Parameters.AddWithValue("@Row", i);
+                        sqlCmdAddBord.Parameters.AddWithValue("@Col", j);
+                        sqlCmdAddBord.Parameters.AddWithValue("@Kleur", localGame.Bord[i, j]);
+                        sqlCmdAddBord.ExecuteNonQuery();
+                        
+                    }
+                }
+                sqlCon.Close();
 
-                sqlCmd.Parameters.AddWithValue("@spelToken", spelToken);
-                sqlCmd.Parameters.AddWithValue("@colour", colour);
-                sqlCmd.Parameters.AddWithValue("@x", x);
-                sqlCmd.Parameters.AddWithValue("@y", y);
-
-                sqlCmd.ExecuteNonQuery();
             }
+            NextTurn(spelToken, (int)localGame.AandeBeurt);
         }
 
         public Spel GetSpel(string spelToken)
@@ -119,6 +129,20 @@ namespace ReversiRestApi.DAL
             return spelList;
         }
 
+        public void RemoveBord(string gameToken)
+        {
+            using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
+            {
+
+                sqlCon.Open();
+                var sqlCmd = new SqlCommand("DELETE FROM Cell WHERE Token = @Token", sqlCon);
+
+                sqlCmd.Parameters.AddWithValue("@Token", gameToken);
+
+                sqlCmd.ExecuteNonQuery();
+            }
+        }
+
         public void RemoveGame(string spelToken)
         {
                 using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
@@ -132,17 +156,47 @@ namespace ReversiRestApi.DAL
                     sqlCmd.ExecuteNonQuery();
                 }
         }
-        public void AddPlayer(string gameToken, string playerToken)
+        public void NextTurn(string gameToken, int currentPlayer)
         {
             using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
             {
-                sqlCon.Open();
-                var sqlCmd = new SqlCommand("UPDATE Games SET Speler2Token = @player2Token WHERE Token = @gameToken", sqlCon);
+                    sqlCon.Open();
+                    var sqlCmd = new SqlCommand("UPDATE Games SET AandeBeurt = @AandeBeurt WHERE Token = @gameToken", sqlCon);
 
-                sqlCmd.Parameters.AddWithValue("@player2Token", playerToken);
-                sqlCmd.Parameters.AddWithValue("@gameToken", gameToken);
-
+                    sqlCmd.Parameters.AddWithValue("@AandeBeurt", currentPlayer);
+                    sqlCmd.Parameters.AddWithValue("@gameToken", gameToken);
                 sqlCmd.ExecuteNonQuery();
+            }
+        }
+
+        public bool AddPlayer(string gameToken, string playerToken)
+        {
+            using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
+            {
+                try
+                {
+                    sqlCon.Open();
+                    var sqlCmd = new SqlCommand("UPDATE Games SET Speler2Token = @player2Token WHERE Token = @gameToken", sqlCon);
+
+                    sqlCmd.Parameters.AddWithValue("@player2Token", playerToken);
+                    sqlCmd.Parameters.AddWithValue("@gameToken", gameToken);
+
+                    var result = sqlCmd.ExecuteNonQuery();
+                    if (result != 0)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                } catch(Exception e)
+                {
+                    return false;
+                }
+                
+
+                
             }
         }
     }
