@@ -587,7 +587,7 @@ namespace NUnitTestProjectReversiSpel
             //                     1 <
             // Act
             spel.AandeBeurt = Kleur.Wit;
-            var actual = spel.DoeZet(8, 8);
+            var actual = spel.PlacePiece(8, 8);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
@@ -616,7 +616,7 @@ namespace NUnitTestProjectReversiSpel
 
             // Act
             spel.AandeBeurt = Kleur.Zwart;
-            var actual = spel.DoeZet(2, 3);
+            var actual = spel.PlacePiece(2, 3);
             // Assert
             Assert.IsTrue(actual);
             Assert.AreEqual(Kleur.Zwart, spel.Bord[2, 3]);
@@ -644,7 +644,7 @@ namespace NUnitTestProjectReversiSpel
 
             // Act
             spel.AandeBeurt = Kleur.Wit;
-            var actual = spel.DoeZet(2, 3);
+            var actual = spel.PlacePiece(2, 3);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
@@ -677,7 +677,7 @@ namespace NUnitTestProjectReversiSpel
             // 7   0 0 0 0 0 0 0 0
             // Act
             spel.AandeBeurt = Kleur.Zwart;
-            var actual = spel.DoeZet(0, 3);
+            var actual = spel.PlacePiece(0, 3);
             // Assert
             Assert.IsTrue(actual);
             Assert.AreEqual(Kleur.Zwart, spel.Bord[0, 3]);
@@ -709,7 +709,7 @@ namespace NUnitTestProjectReversiSpel
 
             // Act
             spel.AandeBeurt = Kleur.Wit;
-            var actual = spel.DoeZet(0, 3);
+            var actual = spel.PlacePiece(0, 3);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
@@ -749,7 +749,7 @@ namespace NUnitTestProjectReversiSpel
 
             // Act
             spel.AandeBeurt = Kleur.Zwart;
-            var actual = spel.DoeZet(0, 3);
+            var actual = spel.PlacePiece(0, 3);
             // Assert
             Assert.IsTrue(actual);
             Assert.AreEqual(Kleur.Zwart, spel.Bord[0, 3]);
@@ -788,7 +788,7 @@ namespace NUnitTestProjectReversiSpel
 
             // Act
             spel.AandeBeurt = Kleur.Zwart;
-            var actual = spel.DoeZet(0, 3);
+            var actual = spel.PlacePiece(0, 3);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
@@ -820,7 +820,7 @@ namespace NUnitTestProjectReversiSpel
             // 7   0 0 0 0 0 0 0 0
             // Act
             spel.AandeBeurt = Kleur.Zwart;
-            var actual = spel.DoeZet(4, 7);
+            var actual = spel.PlacePiece(4, 7);
             // Assert
             Assert.IsTrue(actual);
 
@@ -851,7 +851,7 @@ namespace NUnitTestProjectReversiSpel
 
             // Act
             spel.AandeBeurt = Kleur.Wit;
-            var actual = spel.DoeZet(4, 7);
+            var actual = spel.PlacePiece(4, 7);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
@@ -889,7 +889,7 @@ namespace NUnitTestProjectReversiSpel
 
             // Act
             spel.AandeBeurt = Kleur.Zwart;
-            var actual = spel.DoeZet(4, 7);
+            var actual = spel.PlacePiece(4, 7);
             // Assert
             Assert.IsTrue(actual);
             Assert.AreEqual(Kleur.Zwart, spel.Bord[4, 0]);
@@ -928,7 +928,7 @@ namespace NUnitTestProjectReversiSpel
 
             // Act
             spel.AandeBeurt = Kleur.Wit;
-            var actual = spel.DoeZet(4, 7);
+            var actual = spel.PlacePiece(4, 7);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
@@ -977,7 +977,7 @@ namespace NUnitTestProjectReversiSpel
 
             // Act
             spel.AandeBeurt = Kleur.Wit;
-            var actual = spel.DoeZet(2, 2);
+            var actual = spel.PlacePiece(2, 2);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
@@ -1006,7 +1006,7 @@ namespace NUnitTestProjectReversiSpel
 
             // Act
             spel.AandeBeurt = Kleur.Zwart;
-            var actual = spel.DoeZet(2, 2);
+            var actual = spel.PlacePiece(2, 2);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
@@ -1038,7 +1038,7 @@ namespace NUnitTestProjectReversiSpel
             // 7   0 0 0 0 0 0 0 0
             // Act
             spel.AandeBeurt = Kleur.Wit;
-            var actual = spel.DoeZet(0, 7);
+            var actual = spel.PlacePiece(0, 7);
             // Assert
             Assert.IsTrue(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[5, 2]);
@@ -1069,7 +1069,7 @@ namespace NUnitTestProjectReversiSpel
             // 7   0 0 0 0 0 0 0 0
             // Act
             spel.AandeBeurt = Kleur.Zwart;
-            var actual = spel.DoeZet(0, 7);
+            var actual = spel.PlacePiece(0, 7);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
@@ -1105,7 +1105,7 @@ namespace NUnitTestProjectReversiSpel
             // 7   0 0 0 0 0 0 0 2 <
             // Act
             spel.AandeBeurt = Kleur.Zwart;
-            var actual = spel.DoeZet(7, 7);
+            var actual = spel.PlacePiece(7, 7);
             // Assert
             Assert.IsTrue(actual);
 
@@ -1137,7 +1137,7 @@ namespace NUnitTestProjectReversiSpel
             // 7   0 0 0 0 0 0 0 1 <
             // Act
             spel.AandeBeurt = Kleur.Wit;
-            var actual = spel.DoeZet(7, 7);
+            var actual = spel.PlacePiece(7, 7);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
@@ -1172,7 +1172,7 @@ namespace NUnitTestProjectReversiSpel
             // 7   0 0 0 0 0 0 0 0 
             // Act
             spel.AandeBeurt = Kleur.Zwart;
-            var actual = spel.DoeZet(0, 0);
+            var actual = spel.PlacePiece(0, 0);
             // Assert
             Assert.IsTrue(actual);
             Assert.AreEqual(Kleur.Zwart, spel.Bord[0, 0]);
@@ -1203,7 +1203,7 @@ namespace NUnitTestProjectReversiSpel
             // 7   0 0 0 0 0 0 0 0          
             // Act
             spel.AandeBeurt = Kleur.Wit;
-            var actual = spel.DoeZet(0, 0);
+            var actual = spel.PlacePiece(0, 0);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
@@ -1239,7 +1239,7 @@ namespace NUnitTestProjectReversiSpel
             // 7   1 0 0 0 0 0 0 0 <
             // Act
             spel.AandeBeurt = Kleur.Wit;
-            var actual = spel.DoeZet(7, 0);
+            var actual = spel.PlacePiece(7, 0);
             // Assert
             Assert.IsTrue(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[7, 0]);
@@ -1270,7 +1270,7 @@ namespace NUnitTestProjectReversiSpel
             // 7   2 0 0 0 0 0 0 0 <
             // Act
             spel.AandeBeurt = Kleur.Zwart;
-            var actual = spel.DoeZet(7, 0);
+            var actual = spel.PlacePiece(7, 0);
             // Assert
             Assert.IsFalse(actual);
             Assert.AreEqual(Kleur.Wit, spel.Bord[3, 3]);
