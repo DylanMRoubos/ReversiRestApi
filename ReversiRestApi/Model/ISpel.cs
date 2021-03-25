@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ReversiRestApi.Model;
 
 namespace ReversiRestApi
 {
@@ -17,7 +18,8 @@ namespace ReversiRestApi
         bool Pas();
         bool Afgelopen();
         Kleur OverwegendeKleur();
-        bool ZetMogelijk(int rijZet, int kolomZet);
+        List<Direction> ZetMogelijk(int rijZet, int kolomZet);
         bool PlacePiece(int rijZet, int kolomZet);
+        void PlacePiecesInDirections(List<Direction> directions, Kleur colour, int x, int y);
     }
 }

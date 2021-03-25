@@ -12,6 +12,8 @@ namespace ReversiRestApi.Model
         public string PlayerToken2 { get; set; }
         public string Board { get; set; }
         public Kleur CurrentPlayer { get; set; }
+        public bool Finished { get; set; }
+        public string Winner { get; set; }
 
 
         public SpelTbvJson(Spel spel)
@@ -23,6 +25,8 @@ namespace ReversiRestApi.Model
             PlayerToken2 = spel.Speler2Token;
             CurrentPlayer = spel.AandeBeurt;
             Board = JsonConvert.SerializeObject(spel.Bord);
+            Finished = spel.Finished;
+            Winner = spel.Winner;
         }
     }
 }

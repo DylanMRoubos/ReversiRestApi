@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Threading;
 
 namespace ReversiRestApi.DAL
 {
@@ -55,17 +56,14 @@ namespace ReversiRestApi.DAL
             }
         }
 
-        public void PlacePiece(string spelToken, int colour, int x, int y, Spel localGame)
+        public void PlacePiece(string spelToken, Spel localGame)
         {
 
             using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
             {
-
-                RemoveBord(spelToken);
-
                 Console.WriteLine(localGame.Bord);
                 sqlCon.Open();
-                string addBordQuery = "INSERT INTO Cell (Token, Row, Col, Kleur) VALUES (@Token, @Row, @Col, @Kleur)";
+                string addBordQuery = "UPDATE Cell SET kleur = @Kleur WHERE Token = @Token AND Row = @Row AND Col = @Col";
                 //Loops over game bord and adds all cells with x and y locations and the colour that occupies the space and the game token
                 for (int i = 0; i < localGame.Bord.GetLength(0); i++)
                 {
@@ -76,14 +74,29 @@ namespace ReversiRestApi.DAL
                         sqlCmdAddBord.Parameters.AddWithValue("@Row", i);
                         sqlCmdAddBord.Parameters.AddWithValue("@Col", j);
                         sqlCmdAddBord.Parameters.AddWithValue("@Kleur", localGame.Bord[i, j]);
+
+                        Console.WriteLine(DateTime.Now.ToString() + i + ", " + j + localGame.Bord[i, j] + Thread.CurrentThread.ManagedThreadId);
                         sqlCmdAddBord.ExecuteNonQuery();
                         
                     }
                 }
+                //Check if game is finished & if it is update
+                if (localGame.Finished == true)
+                {
+                    string addWinner = "UPDATE Games SET Afgelopen = 1, Winnaar = @Winner WHERE Token = @Token";
+                    SqlCommand sqlCmd = new SqlCommand(addWinner, sqlCon);
+                    sqlCmd.Parameters.AddWithValue("@Winner", localGame.Winner);
+                    sqlCmd.Parameters.AddWithValue("@Token", spelToken);
+
+                    sqlCmd.ExecuteNonQuery();
+                }
                 sqlCon.Close();
 
             }
-            NextTurn(spelToken, (int)localGame.AandeBeurt);
+            //Adds te amount of piecies from the other player
+            AddPieceToHistory(spelToken, localGame.PlayerToken1, localGame.getPieceAmount(Kleur.Wit));
+            AddPieceToHistory(spelToken, localGame.Speler2Token, localGame.getPieceAmount(Kleur.Zwart));
+            NextTurn(spelToken, localGame.AandeBeurt);
         }
 
         public Spel GetSpel(string spelToken)
@@ -103,10 +116,13 @@ namespace ReversiRestApi.DAL
                     spel.Speler2Token = Convert.ToString(rdr["Speler2Token"]);
                     spel.Description = Convert.ToString(rdr["Omschrijving"]);
                     spel.AandeBeurt = (Kleur)Convert.ToInt32(rdr["AandeBeurt"]);
-                    spel.Bord[Convert.ToInt32(rdr["Col"]), Convert.ToInt32(rdr["Row"])] = (Kleur)Convert.ToInt32(rdr["Kleur"]);
+                    spel.Finished = Convert.ToBoolean(rdr["Afgelopen"]);
+                    spel.Winner = Convert.ToString(rdr["Winnaar"]);
+                    spel.Bord[Convert.ToInt32(rdr["Row"]), Convert.ToInt32(rdr["Col"])] = (Kleur)Convert.ToInt32(rdr["Kleur"]);                    
                 }
                 sqlCon.Close();
             }
+
             return spel;
         }
 
@@ -125,8 +141,58 @@ namespace ReversiRestApi.DAL
                 {
                     spelList.Add(GetSpel(Convert.ToString(rdr["Token"])));
                 }
+                sqlCon.Close();
             }
             return spelList;
+        }
+        public void AddPieceToHistory(string gameToken, string playerToken, int amount)
+        {
+            using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
+            {
+                sqlCon.Open();
+                string addHistory = "INSERT INTO PieceHistory(GameToken, PlayerToken, Amount) VALUES(@gameToken, @playerToken, @amount)";
+
+                SqlCommand sqlCmd = new SqlCommand(addHistory, sqlCon);
+                sqlCmd.Parameters.AddWithValue("@gameToken", gameToken);
+                sqlCmd.Parameters.AddWithValue("@playerToken", playerToken);
+                sqlCmd.Parameters.AddWithValue("@amount", amount);
+
+                sqlCmd.ExecuteNonQuery();
+                sqlCon.Close();
+            }
+        }
+
+        public List<GameHistory> GetGameHistory(string Gametoken, string PlayerToken)
+        {
+            var gameHistory = new List<GameHistory>();
+            string sqlQuery = "SELECT GameToken, PlayerToken, Amount, CreateData FROM PieceHistory WHERE Gametoken = @GameToken AND PlayerToken = @PlayerToken ORDER BY CreateData ASC";
+
+            using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
+            {
+                sqlCon.Open();
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlCon);
+                sqlCmd.Parameters.AddWithValue("@GameToken", Gametoken);
+                sqlCmd.Parameters.AddWithValue("@PlayerToken", PlayerToken);
+                SqlDataReader rdr = sqlCmd.ExecuteReader();
+
+                if(rdr.HasRows)
+                {
+                    while (rdr.Read())
+                    {
+                        gameHistory.Add(new GameHistory()
+                        {
+                            GameToken = Convert.ToString(rdr["GameToken"]),
+                            PlayerToken = Convert.ToString(rdr["PlayerToken"]),
+                            Amount = (int)Convert.ToInt64(rdr["Amount"]),
+                            CreateData = Convert.ToString(rdr["CreateData"])
+                        });
+                    }
+                }
+
+               
+                sqlCon.Close();
+            }
+            return gameHistory;
         }
 
         public void RemoveBord(string gameToken)
@@ -140,6 +206,7 @@ namespace ReversiRestApi.DAL
                 sqlCmd.Parameters.AddWithValue("@Token", gameToken);
 
                 sqlCmd.ExecuteNonQuery();
+                sqlCon.Close();
             }
         }
 
@@ -156,16 +223,31 @@ namespace ReversiRestApi.DAL
                     sqlCmd.ExecuteNonQuery();
                 }
         }
-        public void NextTurn(string gameToken, int currentPlayer)
+
+        //public void Surrender(string gameToken, Spel game)
+        //{
+        //    using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
+        //    {
+
+        //        sqlCon.Open();
+        //        var sqlCmd = new SqlCommand("DELETE FROM Games WHERE Token = @Token", sqlCon);
+
+        //        sqlCmd.Parameters.AddWithValue("@Token", spelToken);
+
+        //        sqlCmd.ExecuteNonQuery();
+        //    }
+        //}
+        public void NextTurn(string gameToken, Kleur colour)
         {
             using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
             {
                     sqlCon.Open();
                     var sqlCmd = new SqlCommand("UPDATE Games SET AandeBeurt = @AandeBeurt WHERE Token = @gameToken", sqlCon);
 
-                    sqlCmd.Parameters.AddWithValue("@AandeBeurt", currentPlayer);
+                    sqlCmd.Parameters.AddWithValue("@AandeBeurt", (int)colour);
                     sqlCmd.Parameters.AddWithValue("@gameToken", gameToken);
                 sqlCmd.ExecuteNonQuery();
+                sqlCon.Close();
             }
         }
 
@@ -182,6 +264,7 @@ namespace ReversiRestApi.DAL
                     sqlCmd.Parameters.AddWithValue("@gameToken", gameToken);
 
                     var result = sqlCmd.ExecuteNonQuery();
+                    sqlCon.Close();
                     if (result != 0)
                     {
                         return true;
@@ -193,10 +276,7 @@ namespace ReversiRestApi.DAL
                 } catch(Exception e)
                 {
                     return false;
-                }
-                
-
-                
+                }                               
             }
         }
     }

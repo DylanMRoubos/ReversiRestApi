@@ -57,12 +57,27 @@ namespace ReversiRestApi.Model
             throw new NotImplementedException();
         }
 
-        void ISpelRepository.PlacePiece(string gameToken, int aandeBeurt, int x, int y, Spel localGame)
+        void ISpelRepository.PlacePiece(string gameToken, Spel localGame)
         {
             throw new NotImplementedException();
         }
 
         bool ISpelRepository.AddPlayer(string gameToken, string speler2Token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<GameHistory> GetGameHistory(string Gametoken, string PlayerToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddPieceToHistory(string gameToken, string playerToken, int amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void NextTurn(string gameToken, Kleur colour)
         {
             throw new NotImplementedException();
         }

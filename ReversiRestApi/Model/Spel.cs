@@ -50,7 +50,7 @@ namespace ReversiRestApi.Model
         public bool Finished { get; set; }
         public string Winner { get; set; }
         
-        public Kleur GetPlayerColour(string playerToken)
+        public Kleur GetPlayerColourOnToken(string playerToken)
         {
             try
             {
@@ -67,17 +67,40 @@ namespace ReversiRestApi.Model
             
         }
 
+        public string GetPlayerTokenOnColour(Kleur playerColour)
+        {
+            if(playerColour == Kleur.Wit)
+            {
+                return PlayerToken1;
+            } else
+            {
+                return Speler2Token;
+            }
+
+        }
+
+        public string getCurrentPlayerToken()
+        {
+            if(AandeBeurt == Kleur.Wit)
+            {
+                return PlayerToken1;
+            } else
+            {
+                return Speler2Token;
+            }
+        }
+
         public bool Afgelopen()
         {
             //Check if all squares are placed
-            for (int i = 0; i < Bord.GetLength(1); i++)
+            for (int i = 0; i < Bord.GetLength(0); i++)
             {
-                for (int j = 0; j < Bord.GetLength(0); j++)
+                for (int j = 0; j < Bord.GetLength(1); j++)
                 {
                     //Check if piece can be placed if square is empty
                     if(Bord[i, j] == Kleur.Geen)
                     {
-                        if(ZetMogelijk(i, j))
+                        if(ZetMogelijk(i, j).Count > 0)
                         {
                             return false;
                         }
@@ -88,12 +111,26 @@ namespace ReversiRestApi.Model
         }
 
         public bool PlacePiece(int rijZet, int kolomZet)
-        {
-            if(ZetMogelijk(rijZet, kolomZet)) {
-                Bord[kolomZet, rijZet] = AandeBeurt;
-                return Pas();
-            }
+        {            
+            ChangeNewPiecesToNormal();
 
+            var directions = ZetMogelijk(rijZet, kolomZet);
+            var currentColour = Kleur.Geen;
+
+            if(AandeBeurt == Kleur.Wit)
+            {
+                currentColour = Kleur.WhiteNew;
+            } else
+            {
+                currentColour = Kleur.BlackNew;
+            }
+             
+            if(directions.Count != 0)
+            {
+                Bord[rijZet, kolomZet] = currentColour;
+                PlacePiecesInDirections(directions, currentColour, rijZet, kolomZet);                
+                return Pas();
+            }                                  
             return false;
         }
 
@@ -145,9 +182,10 @@ namespace ReversiRestApi.Model
 
         public bool Pas()
         {
+
             if(AandeBeurt == Kleur.Wit)
             {
-                AandeBeurt = Kleur.Zwart;
+                AandeBeurt = Kleur.Zwart;                
                 return true;
             }
             else if (AandeBeurt == Kleur.Zwart)
@@ -158,13 +196,55 @@ namespace ReversiRestApi.Model
             return false;
         }
 
-        public bool ZetMogelijk(int rijZet, int kolomZet)
-        { 
+        public int getPieceAmount(Kleur colour)
+        {
+            int amount = 0;
+            Kleur colour2 = Kleur.Geen;
+
+            if (colour == Kleur.Wit)
+            {
+                colour2 = Kleur.WhiteNew;
+            } else
+            {
+                colour2 = Kleur.BlackNew;
+            }            
+            for (int i = 0; i < Bord.GetLength(0); i++)
+            {
+                for (int j = 0; j < Bord.GetLength(1); j++)
+                {
+                    if (Bord[i, j] == colour || Bord[i, j] == colour2)
+                    {
+                        amount++;
+                    }
+                }
+            }
+            return amount;
+
+        }
+        public void PlacePiecesInDirections(List<Direction> directions, Kleur colour, int x, int y)
+        {
+
+            for (int i = 0; i < directions.Count; i++)
+            {
+                PlacePieceInDirection(directions[i], colour, x, y);
+            }
+        }
+
+        public List<Direction> ZetMogelijk(int rijZet, int kolomZet)
+        {
+            if (Afgelopen())
+            {
+                Winner = GetPlayerTokenOnColour(OverwegendeKleur());
+                Finished = true;
+            }
+
+            ChangeNewPiecesToNormal();
+            List<Direction> possibleDirections = new List<Direction>();
             //return false if piece is placed outside of board
-            if (rijZet > 7 || kolomZet > 7 || kolomZet < 0 || rijZet < 0) return false;
+            if (rijZet > 7 || kolomZet > 7 || kolomZet < 0 || rijZet < 0) return possibleDirections;
 
             //check if no other piece is in place
-            if (Bord[rijZet, kolomZet] != Kleur.Geen) return false;
+            if (Bord[rijZet, kolomZet] != Kleur.Geen) return possibleDirections;
 
             //Check if there is a piece of the different color connected
             Kleur[,] surroundingPieces = new Kleur[3, 3];
@@ -184,9 +264,7 @@ namespace ReversiRestApi.Model
                             {
                                 if (CheckForPieceInDirection((Direction)direction, Kleur.Wit, x, y))
                                 {
-
-                                    PlacePieceInDirection((Direction)direction, Kleur.Wit, x, y);
-                                    return true;
+                                    possibleDirections.Add((Direction)direction);                                 
                                 }
                             }
                             else if ((AandeBeurt == Kleur.Zwart) && (Bord[x, y] == Kleur.Wit))
@@ -194,8 +272,7 @@ namespace ReversiRestApi.Model
                                 //check if there is a black piece in direction of the black piece
                                 if (CheckForPieceInDirection((Direction)direction, Kleur.Zwart, x, y))
                                 {
-                                    PlacePieceInDirection((Direction)direction, Kleur.Zwart, x, y);
-                                    return true;
+                                    possibleDirections.Add((Direction)direction);
                                 }
                             }
                             surroundingPieces[i, j] = Bord[x, y];
@@ -217,8 +294,7 @@ namespace ReversiRestApi.Model
                 
             }
 
-            //PrintSurrounding(surroundingPieces);
-            return false;
+            return possibleDirections;
         }
 
         public void PrintBoard()
@@ -256,6 +332,23 @@ namespace ReversiRestApi.Model
             }
         }
 
+        public void ChangeNewPiecesToNormal()
+        {
+            for (int i = 0; i < Bord.GetLength(0); i++)
+            {
+                for (int j = 0; j < Bord.GetLength(1); j++)
+                {
+                    if(Bord[i, j] == Kleur.WhiteNew)
+                    {
+                        Bord[i, j] = Kleur.Wit;
+                    } else if(Bord[i, j] == Kleur.BlackNew)
+                    {
+                        Bord[i, j] = Kleur.Zwart;
+                    }                    
+                }
+            }
+        }
+
         public bool CheckForPieceInDirection(Direction direction, Kleur colour, int row, int col)
         {
             bool result = false;
@@ -275,10 +368,10 @@ namespace ReversiRestApi.Model
                     for (int i = col; i < 8; i++) { if (Bord[row, i] == colour) { result = true; break; } if (Bord[row, i] == Kleur.Geen) { break; } }
                     break;
                 case Direction.NorthEast:
-                    for (int i = row, j = col, k = 0; k <= Math.Min(row, 8 - col); i--, j++, k++) { if (Bord[i, j] == colour) { result = true; break; } if (Bord[i, j] == Kleur.Geen) { break; } }
+                    for (int i = row, j = col, k = 0; k < Math.Min(row, 8 - col); i--, j++, k++) { if (Bord[i, j] == colour) { result = true; break; } if (Bord[i, j] == Kleur.Geen) { break; } }
                     break;
                 case Direction.SouthWest:
-                    for (int i = row, j = col, k = 0; k <= Math.Min(8 - row, col); i++, j--, k++) { if (Bord[i, j] == colour) { result = true; break; } if (Bord[i, j] == Kleur.Geen) { break; } }
+                    for (int i = row, j = col, k = 0; k < Math.Min(8 - row, col); i++, j--, k++) { if (Bord[i, j] == colour) { result = true; break; } if (Bord[i, j] == Kleur.Geen) { break; } }
                     break;
                 case Direction.NorthWest:
                     for (int i = row, j = col, k = Math.Min(row, col); k >= 0; i--, j--, k--) { if (Bord[i, j] == colour) { result = true; break; } if (Bord[i, j] == Kleur.Geen) { break; } }
@@ -289,6 +382,7 @@ namespace ReversiRestApi.Model
             }
             return result;
         }
+        //TODO: Fix placing of the pieces, i assume there is an offset issue
         public void PlacePieceInDirection(Direction direction, Kleur colour, int row, int col)
         {
             switch (direction)
@@ -305,17 +399,19 @@ namespace ReversiRestApi.Model
                 case Direction.East:
                     for (int i = col; i < 8; i++) { if (Bord[row, i] != Kleur.Geen) { Bord[row, i] = colour; } else { break; } }
                     break;
+                    //TODO: FIX NORTH EAST BUG
                 case Direction.NorthEast:
-                    for (int i = row, j = col, k = 0; k <= Math.Min(row, 8 - col); i--, j++, k++) { if (Bord[i, j] != Kleur.Geen) { Bord[j, i] = colour; } else { break; } }
+                    for (int i = row, j = col, k = 0; k < Math.Min(row, 8 - col); i--, j++, k++) { if (Bord[i, j] != Kleur.Geen) { Bord[i, j] = colour; } else { break; } }
                     break;
                 case Direction.SouthWest:
-                    for (int i = row, j = col, k = 0; k <= Math.Min(8 - row, col); i++, j--, k++) { if (Bord[i, j] != Kleur.Geen) { Bord[j, i] = colour; } else { break; } }
+                    for (int i = row, j = col, k = 0; k < Math.Min(8 - row, col); i++, j--, k++) { if (Bord[i, j] != Kleur.Geen) { Bord[i, j] = colour; } else { break; } }
                     break;
+                    //Misses one cell
                 case Direction.NorthWest:
-                    for (int i = row, j = col, k = Math.Min(row, col); k >= 0; i--, j--, k--) { if (Bord[i, j] != Kleur.Geen) { Bord[j, i] = colour; } else { break; } }
+                    for (int i = row, j = col, k = Math.Min(row, col); k >= 0; i--, j--, k--) { if (Bord[i, j] != Kleur.Geen) { Bord[i, j] = colour; } else { break; } }
                     break;
                 case Direction.SouthEast:
-                    for (int i = row, j = col, k = Math.Max(row, col); k < 8; i++, j++, k++) { if (Bord[i, j] != Kleur.Geen) { Bord[j, i] = colour; } else { break; } }
+                    for (int i = row, j = col, k = Math.Max(row, col); k < 8; i++, j++, k++) { if (Bord[i, j] != Kleur.Geen) { Bord[i, j] = colour; } else { break; } }
                     break;
             }
         }

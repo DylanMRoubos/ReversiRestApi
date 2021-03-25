@@ -5,6 +5,8 @@ namespace ReversiRestApi
     {
         Geen,
         Wit,        
-        Zwart
+        Zwart,
+        WhiteNew,
+        BlackNew
     }
 }

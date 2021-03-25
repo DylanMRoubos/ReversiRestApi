@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using ReversiRestApi.Model;
 
 namespace ReversiRestApi.Controllers
@@ -17,6 +18,7 @@ namespace ReversiRestApi.Controllers
         {
             iRepository = repository;
         }
+        
         // GET api/spel
         [HttpGet]
         public ActionResult<IEnumerable<string>> GetSpelOmschrijvingenVanSpellenMetWachtendeSpeler()
@@ -45,12 +47,12 @@ namespace ReversiRestApi.Controllers
 
         }
 
+        //Get a single game based on Token
         // GET api/spel{gametoken}
         [HttpGet("{gameToken}")]
         public ActionResult<Spel> GetGame(string gameToken)
         {
-            var spel = iRepository.GetSpel(gameToken);
-
+            var spel = iRepository.GetSpel(gameToken);            
             return new ObjectResult(new SpelTbvJson(spel));
         }
 
@@ -58,7 +60,6 @@ namespace ReversiRestApi.Controllers
         [HttpPut]
         public ActionResult<bool> JoinGame([FromBody] JoinGame data)
         {
-            Console.WriteLine("Yeet");
             if(data.gameToken == "" || data.playerToken == "")
             {
                 return BadRequest("Value must be passed in the request body.");
@@ -111,8 +112,7 @@ namespace ReversiRestApi.Controllers
                 }
                
             }
-            return null;
-           
+            return null;           
         }
 
         // GET api/Beurt/<spelertoken>
@@ -129,9 +129,32 @@ namespace ReversiRestApi.Controllers
                 return new ObjectResult(turn);
             }
             return null;
-
         }
 
+        // GET api/Amount/<gametoken>
+        [HttpGet("Amount/{gameToken}")]
+        public ActionResult GetPieceAmount(string gameToken)
+        {
+            if (!string.IsNullOrWhiteSpace(gameToken))
+            {
+                List<List<GameHistory>> gameHistory = new List<List<GameHistory>>();
+
+                var game = (
+                (from value in iRepository.GetSpellen()
+                 where value.Token.Equals(gameToken)
+                 select value).First());
+
+
+                var Player1History = iRepository.GetGameHistory(game.Token, game.PlayerToken1);
+                var Player2History = iRepository.GetGameHistory(game.Token, game.Speler2Token);
+
+                gameHistory.Add(Player1History);
+                gameHistory.Add(Player2History);
+
+                return new ObjectResult(JsonConvert.SerializeObject(gameHistory));
+            }
+            return null;
+        }
         // Put api/Spel/Zet
         [HttpPut("Zet")]
         public ActionResult<bool> PlacePiece([FromBody]PlacePiece data)
@@ -141,7 +164,7 @@ namespace ReversiRestApi.Controllers
             select value).First();
 
             //Check if the playerToken is on its turn
-            if (game.GetPlayerColour(data.playerToken) != game.AandeBeurt)
+            if (game.GetPlayerColourOnToken(data.playerToken) != game.AandeBeurt)
             {
                 return StatusCode(403);
             }
@@ -151,8 +174,9 @@ namespace ReversiRestApi.Controllers
             {
                  if (game.PlacePiece(data.y, data.x))
                 {
+                    Console.WriteLine(game.Bord);
                     //add zet to db
-                    iRepository.PlacePiece(data.gameToken, (int)game.GetPlayerColour(data.playerToken), data.x, data.y, game);                    
+                    iRepository.PlacePiece(data.gameToken, game);                    
                     return true;
                 }
                 return false;
@@ -172,8 +196,25 @@ namespace ReversiRestApi.Controllers
                         where value.Token.Equals(data.gameToken)
                         select value).First();
 
-            return game.Surrender(data.playerToken);
+            game.Surrender(data.playerToken);
 
+            //iRepository.Surrender(data.gameToken, game);
+
+            return true;
+        }
+
+        // Put api/Spel/Skip
+        [HttpPut("Skip")]
+        public ActionResult<bool> SkipTurn([FromBody] Skip data)
+        {
+
+            var game = (from value in iRepository.GetSpellen()
+                        where value.Token.Equals(data.gameToken)
+                        select value).First();
+
+            game.Pas();
+            iRepository.NextTurn(data.gameToken, game.AandeBeurt);
+            return true;
         }
 
         // POST api/CreateGame
