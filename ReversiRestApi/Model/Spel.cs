@@ -232,12 +232,6 @@ namespace ReversiRestApi.Model
 
         public List<Direction> ZetMogelijk(int rijZet, int kolomZet)
         {
-            if (Afgelopen())
-            {
-                Winner = GetPlayerTokenOnColour(OverwegendeKleur());
-                Finished = true;
-            }
-
             ChangeNewPiecesToNormal();
             List<Direction> possibleDirections = new List<Direction>();
             //return false if piece is placed outside of board
@@ -285,10 +279,10 @@ namespace ReversiRestApi.Model
                         }
                        
                     }
-                    y = y - 3;
+                    y -= 3;
                 } else
                 {
-                    direction = direction + 3;
+                    direction += 3;
                 }                
                 x++;
                 
@@ -382,7 +376,6 @@ namespace ReversiRestApi.Model
             }
             return result;
         }
-        //TODO: Fix placing of the pieces, i assume there is an offset issue
         public void PlacePieceInDirection(Direction direction, Kleur colour, int row, int col)
         {
             switch (direction)
