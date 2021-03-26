@@ -14,6 +14,9 @@ namespace ReversiRestApi.Model
         List<GameHistory> GetGameHistory(string Gametoken, string PlayerToken);
         void AddPieceToHistory(string gameToken, string playerToken, int amount);
         void NextTurn(string gameToken, Kleur colour);
+        bool FinishGame(Spel game);
+        bool AcceptSurrender(string player, Spel game);
+        bool BothPlayersAcceptedEnd(Spel game);
         // ... }
     }
 }

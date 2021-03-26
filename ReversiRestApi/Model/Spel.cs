@@ -92,6 +92,11 @@ namespace ReversiRestApi.Model
 
         public bool Afgelopen()
         {
+            ChangeNewPiecesToNormal();
+            if(Finished)
+            {
+                return true;
+            }
             //Check if all squares are placed
             for (int i = 0; i < Bord.GetLength(0); i++)
             {
@@ -107,6 +112,8 @@ namespace ReversiRestApi.Model
                     }
                 }
             }
+            Finished = true;
+            Winner = GetPlayerTokenOnColour(OverwegendeKleur());
             return true;
         }
 
@@ -392,14 +399,12 @@ namespace ReversiRestApi.Model
                 case Direction.East:
                     for (int i = col; i < 8; i++) { if (Bord[row, i] != Kleur.Geen) { Bord[row, i] = colour; } else { break; } }
                     break;
-                    //TODO: FIX NORTH EAST BUG
                 case Direction.NorthEast:
                     for (int i = row, j = col, k = 0; k < Math.Min(row, 8 - col); i--, j++, k++) { if (Bord[i, j] != Kleur.Geen) { Bord[i, j] = colour; } else { break; } }
                     break;
                 case Direction.SouthWest:
                     for (int i = row, j = col, k = 0; k < Math.Min(8 - row, col); i++, j--, k++) { if (Bord[i, j] != Kleur.Geen) { Bord[i, j] = colour; } else { break; } }
                     break;
-                    //Misses one cell
                 case Direction.NorthWest:
                     for (int i = row, j = col, k = Math.Min(row, col); k >= 0; i--, j--, k--) { if (Bord[i, j] != Kleur.Geen) { Bord[i, j] = colour; } else { break; } }
                     break;

@@ -81,6 +81,21 @@ namespace ReversiRestApi.Model
         {
             throw new NotImplementedException();
         }
+
+        public bool FinishGame(Spel game)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool AcceptSurrender(string player, Spel game)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool BothPlayersAcceptedEnd(Spel game)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

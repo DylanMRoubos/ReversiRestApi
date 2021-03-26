@@ -217,11 +217,14 @@ namespace ReversiRestApi.DAL
 
                     sqlCon.Open();
                     var sqlCmd = new SqlCommand("DELETE FROM Games WHERE Token = @Token", sqlCon);
+                    var sqlCmd1 = new SqlCommand("DELETE FROM Cell WHERE Token = @Token", sqlCon);
 
-                    sqlCmd.Parameters.AddWithValue("@Token", spelToken);
+                sqlCmd.Parameters.AddWithValue("@Token", spelToken);
+                sqlCmd1.Parameters.AddWithValue("@Token", spelToken);
 
-                    sqlCmd.ExecuteNonQuery();
-                }
+                sqlCmd.ExecuteNonQuery();
+                sqlCmd1.ExecuteNonQuery();
+            }
         }
 
         //public void Surrender(string gameToken, Spel game)
@@ -278,6 +281,67 @@ namespace ReversiRestApi.DAL
                     return false;
                 }                               
             }
+        }
+
+        public bool FinishGame(Spel game)
+        {
+            using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
+            {
+                sqlCon.Open();
+                var sqlCmd = new SqlCommand("UPDATE Games SET Afgelopen = 1, Winnaar = @Winner WHERE Token = @gameToken", sqlCon);
+
+                sqlCmd.Parameters.AddWithValue("@Winner", game.Winner);
+                sqlCmd.Parameters.AddWithValue("@gameToken", game.Token);
+                var result = sqlCmd.ExecuteNonQuery();
+
+                sqlCon.Close();
+
+                return true;
+            }
+        }
+        public bool AcceptSurrender(string player, Spel game)
+        {
+            using(SqlConnection sqlCon = new SqlConnection(ConnectionString))
+            {
+                sqlCon.Open();
+                var sqlCmd = new SqlCommand("UPDATE Games SET " + player + " = 1 WHERE Token = @gameToken", sqlCon);
+
+                sqlCmd.Parameters.AddWithValue("@gameToken", game.Token);
+                var result = sqlCmd.ExecuteNonQuery();                
+                sqlCon.Close();
+
+                if (result > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool BothPlayersAcceptedEnd(Spel game)
+        {
+            using (SqlConnection sqlCon = new SqlConnection(ConnectionString))
+            {
+                string query = "SELECT player1DeleteCheck, player2DeleteCheck FROM Games WHERE Games.Token = @gameToken";
+                sqlCon.Open();
+                SqlCommand sqlCmd = new SqlCommand(query, sqlCon);
+                sqlCmd.Parameters.AddWithValue("@gameToken", game.Token);
+                SqlDataReader rdr = sqlCmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    var accept1 = Convert.ToString(rdr["player1DeleteCheck"]);
+                    var accept2 = Convert.ToString(rdr["player2DeleteCheck"]);
+
+                    if(accept1 == "True" && accept2 == "True")
+                    {
+                        //Dit is het moment dat de api het weet
+                        game = null;
+                        return true;
+                    }
+                }
+                sqlCon.Close();
+            }
+            return false;
         }
     }
 }

@@ -52,8 +52,15 @@ namespace ReversiRestApi.Controllers
         [HttpGet("{gameToken}")]
         public ActionResult<Spel> GetGame(string gameToken)
         {
-            var spel = iRepository.GetSpel(gameToken);            
-            return new ObjectResult(new SpelTbvJson(spel));
+            try
+            {
+                var spel = iRepository.GetSpel(gameToken);
+                return new ObjectResult(new SpelTbvJson(spel));
+            } catch (Exception e)
+            {
+                return null;
+            }
+            
         }
 
         // PUT api/spel
@@ -124,11 +131,38 @@ namespace ReversiRestApi.Controllers
                 var turn = (
                 (from value in iRepository.GetSpellen()
                  where value.Token.Equals(gameToken)
-                 select value.AandeBeurt).First());
+                 select value.AandeBeurt).FirstOrDefault());
 
                 return new ObjectResult(turn);
             }
             return null;
+        }
+
+        // GET api/spel/Finished/<gameToken>
+        [HttpGet("Finished/{gameToken}")]
+        public bool IsFinished(string gameToken)
+        {
+            if (!string.IsNullOrWhiteSpace(gameToken))
+            {
+                var game = (
+                (from value in iRepository.GetSpellen()
+                 where value.Token.Equals(gameToken)
+                 select value).FirstOrDefault());
+
+                if(game == null)
+                {
+                    return false;
+                }
+
+                if (game.Afgelopen())
+                {
+                    if(iRepository.FinishGame(game))
+                    {
+                        return true;
+                    }                    
+                }                                
+            }
+            return false;
         }
 
         // GET api/Amount/<gametoken>
@@ -142,7 +176,12 @@ namespace ReversiRestApi.Controllers
                 var game = (
                 (from value in iRepository.GetSpellen()
                  where value.Token.Equals(gameToken)
-                 select value).First());
+                 select value).FirstOrDefault());
+
+                if(game == null)
+                {
+                    return null;
+                }
 
 
                 var Player1History = iRepository.GetGameHistory(game.Token, game.PlayerToken1);
@@ -161,7 +200,7 @@ namespace ReversiRestApi.Controllers
         {
             var game = (from value in iRepository.GetSpellen()
             where value.Token.Equals(data.gameToken)
-            select value).First();
+            select value).FirstOrDefault();
 
             //Check if the playerToken is on its turn
             if (game.GetPlayerColourOnToken(data.playerToken) != game.AandeBeurt)
@@ -194,13 +233,54 @@ namespace ReversiRestApi.Controllers
 
             var game = (from value in iRepository.GetSpellen()
                         where value.Token.Equals(data.gameToken)
-                        select value).First();
+                        select value).FirstOrDefault();
 
             game.Surrender(data.playerToken);
 
-            //iRepository.Surrender(data.gameToken, game);
+            iRepository.FinishGame(game);
 
             return true;
+        }
+        // Put api/Spel/Finish
+        [HttpPut("Finish")]
+        public ActionResult<bool> FinishAccept([FromBody] Surrender data)
+        {
+            try
+            {
+                var game = (from value in iRepository.GetSpellen()
+                            where value.Token.Equals(data.gameToken)
+                            select value).FirstOrDefault();
+                     
+            var player = "";
+
+            if(data.playerToken == game.PlayerToken1)
+            {
+                player = "player1DeleteCheck";
+            }
+            else
+            {
+                player = "player2DeleteCheck";
+            }
+
+            if(iRepository.AcceptSurrender(player, game))
+            {
+                //Check if both parties have agreed, remove the game
+                if(iRepository.BothPlayersAcceptedEnd(game))
+                {
+                    //Update the user wins
+                    iRepository.RemoveGame(game.Token);
+                    return true;
+                }
+                return false;
+
+            }
+            return false;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
         }
 
         // Put api/Spel/Skip
